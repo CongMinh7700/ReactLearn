@@ -21,6 +21,9 @@ pipeline {
         }
 
         stage('Build') {
+            environment {
+                CI = 'false'
+            }
             steps {
                 bat 'yarn build'
             }

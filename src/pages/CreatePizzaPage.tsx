@@ -1,9 +1,5 @@
-import React from 'react'
-
 function CreatePizzaPage() {
-  return (
-    <div>CreatePizzaPage</div>
-  )
+  return <div>CreatePizzaPage</div>;
 }
 
-export default CreatePizzaPage
+export default CreatePizzaPage;
