@@ -29,7 +29,19 @@ pipeline {
                 bat 'yarn build'
             }
         }
+
+        stage('Archive Build') {
+            environment {
+                CI = 'false'
+            }
+            steps {
+                bat 'tar -czf build.tar.gz .next public package.json ecosystem.config.js'
+            }
+        }
         stage('Deploy') {
+            environment {
+                CI = 'false'
+            }
             steps {
                 script {
                     sshPublisher(
