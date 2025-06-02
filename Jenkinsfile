@@ -5,6 +5,7 @@ pipeline {
         NODEJS_HOME = 'C:\\Program Files\\nodejs' // sửa 'Program File' → 'Program Files'
         YARN_HOME = 'C:\\Users\\Deployer\\AppData\\Roaming\\npm' // sửa 'Program File' → 'Program Files'
         PATH = "${NODEJS_HOME};${YARN_HOME};${env.PATH}"
+        DEPLOY_PATH = 'ReactLearn/ui-web_publish'
     }
 
     stages {
@@ -26,6 +27,36 @@ pipeline {
             }
             steps {
                 bat 'yarn build'
+            }
+        }
+        stage('Deploy') {
+            steps {
+                script {
+                    sshPublisher(
+                publishers: [
+                    sshPublisherDesc(
+                        configName: 'UbtService01',
+                        transfers: [
+                            sshTransfer(
+                                sourceFiles: 'build.tar.gz',
+                                removePrefix: '',
+                                remoteDirectory: "${env.DEPLOY_PATH}",
+                                execCommand: """
+                                    cd ${env.DEPLOY_PATH} &&
+                                    tar -xzf build.tar.gz &&
+                                    rm build.tar.gz &&
+                                    yarn install --production &&
+                                    pm2 reload ecosystem.config.js || pm2 start ecosystem.config.js
+                                """.stripIndent(),
+                                execTimeout: 120000
+                            )
+                        ],
+                        usePromotionTimestamp: false,
+                        verbose: true
+                    )
+                ]
+            )
+                }
             }
         }
     }
