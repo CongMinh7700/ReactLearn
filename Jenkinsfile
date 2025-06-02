@@ -38,6 +38,7 @@ pipeline {
                 bat 'tar -czf build.tar.gz .next public package.json ecosystem.config.js'
             }
         }
+
         stage('Deploy') {
             environment {
                 CI = 'false'
@@ -45,29 +46,29 @@ pipeline {
             steps {
                 script {
                     sshPublisher(
-                publishers: [
-                    sshPublisherDesc(
-                        configName: 'UbtService01',
-                        transfers: [
-                            sshTransfer(
-                                sourceFiles: 'build.tar.gz',
-                                removePrefix: '',
-                                remoteDirectory: "${env.DEPLOY_PATH}",
-                                execCommand: """
-                                    cd ${env.DEPLOY_PATH} &&
-                                    tar -xzf build.tar.gz &&
-                                    rm build.tar.gz &&
-                                    yarn install --production &&
-                                    pm2 reload ecosystem.config.js || pm2 start ecosystem.config.js
-                                """.stripIndent(),
-                                execTimeout: 120000
+                        publishers: [
+                            sshPublisherDesc(
+                                configName: 'UbtService01',
+                                transfers: [
+                                    sshTransfer(
+                                        sourceFiles: 'build.tar.gz',
+                                        removePrefix: '',
+                                        remoteDirectory: "${env.DEPLOY_PATH}",
+                                        execCommand: """
+                                            cd ${env.DEPLOY_PATH} &&
+                                            tar -xzf build.tar.gz &&
+                                            rm build.tar.gz &&
+                                            yarn install --production &&
+                                            pm2 reload ecosystem.config.js || pm2 start ecosystem.config.js
+                                        """.stripIndent(),
+                                        execTimeout: 120000
+                                    )
+                                ],
+                                usePromotionTimestamp: false,
+                                verbose: true
                             )
-                        ],
-                        usePromotionTimestamp: false,
-                        verbose: true
+                        ]
                     )
-                ]
-            )
                 }
             }
         }
