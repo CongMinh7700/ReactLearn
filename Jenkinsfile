@@ -2,8 +2,8 @@ pipeline {
     agent any
 
     environment {
-        NODEJS_HOME = 'C:\\Program Files\\nodejs' // sửa 'Program File' → 'Program Files'
-        YARN_HOME = 'C:\\Users\\Deployer\\AppData\\Roaming\\npm' // sửa 'Program File' → 'Program Files'
+        NODEJS_HOME = 'C:\\Program Files\\nodejs'
+        YARN_HOME = 'C:\\Users\\Deployer\\AppData\\Roaming\\npm'
         PATH = "${NODEJS_HOME};${YARN_HOME};${env.PATH}"
         DEPLOY_PATH = 'ReactLearn/ui-web_publish'
     }
@@ -31,18 +31,12 @@ pipeline {
         }
 
         stage('Archive Build') {
-            environment {
-                CI = 'false'
-            }
             steps {
-                bat 'tar -czf build.tar.gz .next public package.json ecosystem.config.js'
+                bat 'tar -czf build.tar.gz build ecosystem.config.js'
             }
         }
 
         stage('Deploy') {
-            environment {
-                CI = 'false'
-            }
             steps {
                 script {
                     sshPublisher(
@@ -61,7 +55,7 @@ pipeline {
                                             yarn install --production &&
                                             pm2 reload ecosystem.config.js || pm2 start ecosystem.config.js
                                         """.stripIndent(),
-                                        execTimeout: 120000
+                                        execTimeout: 300000
                                     )
                                 ],
                                 usePromotionTimestamp: false,
