@@ -3,7 +3,7 @@ module.exports = {
     {
       name: "ReactLearn",
       script: "serve",
-      args: "-s build -l 000:3001",
+      args: "-s build -l 0.0.0.0:3001",
       env: { NODE_ENV: "production" },
     },
   ],
